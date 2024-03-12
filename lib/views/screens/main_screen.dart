@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:urella_courier_management_task/controllers/login_controller.dart';
 
 import '../../controllers/parcel_controller.dart';
+import '../widgets/parcel_item_widget.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -20,59 +21,67 @@ class MainScreen extends StatelessWidget {
         ),
         body: SafeArea(
             child: RefreshIndicator(
-              onRefresh: () async{
-                parcelController.getAllParcel();
-              },
-              child: CustomScrollView(
-          controller: scrollController,
-          slivers: [
+          onRefresh: () async {
+            parcelController.getAllParcel();
+          },
+          child: CustomScrollView(
+            controller: scrollController,
+            slivers: [
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 sliver: SliverToBoxAdapter(
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                          padding: const EdgeInsets.all(20)
-                      ),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.inversePrimary,
+                          padding: const EdgeInsets.all(20)),
                       onPressed: () {
                         parcelController.getAllParcel();
-                      }, child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text("Create Parcel",style: Theme.of(context).textTheme.titleMedium,),
-                      const Icon(Icons.add)
-                    ],
-                  )),
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "Create Parcel",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const Icon(Icons.add)
+                        ],
+                      )),
                 ),
               ),
               Obx(() {
                 return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                  return ListTile(
-                      title: Text(parcelController.parcel_list[index].id));
-                }, childCount: parcelController.parcel_list.length));
+                  return ParcelItemWidget(
+                      parcelModel: parcelController.parcel_list[index]);
+                }, childCount: parcelController.parcel_list.length,));
               }),
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 sliver: SliverToBoxAdapter(
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                          padding: const EdgeInsets.all(20)
-                      ),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.inversePrimary,
+                          padding: const EdgeInsets.all(20)),
                       onPressed: () {
-                    Get.find<LoginController>().logout();
-                  }, child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text("Logout",style: Theme.of(context).textTheme.titleMedium,),
-                      const Icon(Icons.logout)
-                    ],
-                  )),
+                        Get.find<LoginController>().logout();
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            "Logout",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const Icon(Icons.logout)
+                        ],
+                      )),
                 ),
               )
-          ],
-        ),
-            )));
+            ],
+          ),
+        )));
   }
 }

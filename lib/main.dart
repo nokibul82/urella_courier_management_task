@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
     final loginController = Get.put(LoginController());
     return GetMaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orangeAccent),
         useMaterial3: true,

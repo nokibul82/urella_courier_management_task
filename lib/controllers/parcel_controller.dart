@@ -36,7 +36,7 @@ class ParcelController extends GetxController{
       if (response.statusCode == 200) {
         var data = await response.stream.bytesToString();
         var resonseData = responseModelFromJson(data);
-        print(resonseData.content);
+        parcel_list.value = resonseData.content;
       }else if(response.statusCode == 200){
         Get.showSnackbar(const GetSnackBar(
           message: "Access Denied. Invalid Token",
