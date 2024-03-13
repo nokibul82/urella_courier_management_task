@@ -20,14 +20,21 @@ class MainScreen extends StatelessWidget {
       appBar: AppBar(
         titleSpacing: 50,
         title: TextFormField(
-          decoration: const InputDecoration(
-            hintText: "Search for parcel",
-            border: InputBorder.none,
+          autofocus: false,
+          decoration: InputDecoration(
+              hintText: "Search for parcel",
+              border: InputBorder.none,
+              suffix: CircleAvatar(
+                child: IconButton(
+                    onPressed: () {
+                      parcelController.searchParcel(searchController.text);
+                    }, icon: const Icon(Icons.search_rounded)),
+              ),
           ),
           controller: searchController,
-          onChanged: (searchText) {
+          onFieldSubmitted: (searchText) {
             print(searchText);
-            parcelController.update();
+            parcelController.searchParcel(searchText);
           },
         ),
       ),
@@ -40,11 +47,6 @@ class MainScreen extends StatelessWidget {
           controller: scrollController,
           slivers: [
             Obx(() {
-              parcelController.filtered_list.value = parcelController.parcel_list
-                  .where((parcel) => parcel.recipientName.toLowerCase().contains(searchController.text.toLowerCase()) ||
-                  parcel.recipientPhone.toLowerCase().contains(searchController.text.toLowerCase()) ||
-                  parcel.recipientCity.toLowerCase().contains(searchController.text.toLowerCase())
-              ).toList();
               return SliverList(
                   delegate: SliverChildBuilderDelegate(
                 (context, index) {
@@ -59,8 +61,7 @@ class MainScreen extends StatelessWidget {
               sliver: SliverToBoxAdapter(
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).secondaryHeaderColor,
+                        backgroundColor: Theme.of(context).secondaryHeaderColor,
                         padding: const EdgeInsets.all(20)),
                     onPressed: () {
                       Get.find<LoginController>().logout();
@@ -96,9 +97,10 @@ class MainScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.add),
-            SizedBox(width: 5,),
+            SizedBox(
+              width: 5,
+            ),
             Text("Create\nParcel"),
-
           ],
         ),
       ),

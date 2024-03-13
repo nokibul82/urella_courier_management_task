@@ -37,7 +37,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     // Process the form data here (e.g., submit to a server)
-                    await Get.find<ParcelController>().createParcel(
+                    Get.find<ParcelController>().createParcel(
                         merchantOrderId: _merchantOrderId,
                         recipientName: _recipientName,
                         recipientPhone: _recipientPhone,

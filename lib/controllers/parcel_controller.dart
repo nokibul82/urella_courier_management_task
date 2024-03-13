@@ -20,6 +20,7 @@ class ParcelController extends GetxController {
 
   void getAllParcel() async {
     parcel_list.clear();
+    filtered_list.clear();
     prefs = await SharedPreferences.getInstance();
     var authToken = prefs.getString("authToken");
     var page = 1;
@@ -42,14 +43,16 @@ class ParcelController extends GetxController {
             break;
           }
           parcel_list.addAll(resonseData.content);
+          filtered_list.addAll(parcel_list);
           print(parcel_list.length);
         } else if (response.statusCode == 401) {
           Get.showSnackbar(const GetSnackBar(
             message: "Access Denied. Invalid Token",
             duration: Duration(seconds: 2),
           ));
-        }else{
-          var data = json.decode( await response.stream.bytesToString())["message"];
+        } else {
+          var data =
+              json.decode(await response.stream.bytesToString())["message"];
           Get.showSnackbar(const GetSnackBar(
             message: "data",
             duration: Duration(seconds: 2),
@@ -65,51 +68,50 @@ class ParcelController extends GetxController {
     isLoading.value = false;
   }
 
-  Future<void> createParcel({required String merchantOrderId,
-    required String recipientName ,
-    required String recipientPhone ,
-    required String recipientCity ,
-    required String recipientArea ,
-    required String recipientZone ,
-    required String recipientAddress ,
-    required int amountToCollect,
-    required int stockPrice ,
-    required String itemDescription ,
-    required int itemQuantity ,
-    required int itemWeight ,
-    required String specialInstruction ,
-    required String shopId}) async{
+  Future<void> createParcel(
+      {required String merchantOrderId,
+      required String recipientName,
+      required String recipientPhone,
+      required String recipientCity,
+      required String recipientArea,
+      required String recipientZone,
+      required String recipientAddress,
+      required int amountToCollect,
+      required int stockPrice,
+      required String itemDescription,
+      required int itemQuantity,
+      required int itemWeight,
+      required String specialInstruction,
+      required String shopId}) async {
     prefs = await SharedPreferences.getInstance();
     var authToken = prefs.getString("authToken");
     var headers = {
       'Content-Type': 'application/json',
       'x-auth-token': authToken!
     };
-    var request = http.Request(
-        'POST', Uri.parse('${apiUrl}parcels/create'));
+    var request = http.Request('POST', Uri.parse('${apiUrl}parcels/create'));
     request.body = json.encode({
-        "merchantOrderId": merchantOrderId,
-        "recipientName": recipientName,
-        "recipientPhone": recipientPhone,
-        "recipientCity": recipientCity,
-        "recipientArea": recipientArea,
-        "recipientZone": recipientZone,
-        "recipientAddress": recipientAddress,
-        "amountToCollect": amountToCollect,
-        "stockPrice": stockPrice,
-        "itemDescription": itemDescription,
-        "itemQuantity": itemQuantity,
-        "itemWeight": itemWeight,
-        "specialInstruction": specialInstruction,
-        "shopId": shopId
-      }
-    );
+      "merchantOrderId": merchantOrderId,
+      "recipientName": recipientName,
+      "recipientPhone": recipientPhone,
+      "recipientCity": recipientCity,
+      "recipientArea": recipientArea,
+      "recipientZone": recipientZone,
+      "recipientAddress": recipientAddress,
+      "amountToCollect": amountToCollect,
+      "stockPrice": stockPrice,
+      "itemDescription": itemDescription,
+      "itemQuantity": itemQuantity,
+      "itemWeight": itemWeight,
+      "specialInstruction": specialInstruction,
+      "shopId": shopId
+    });
     request.headers.addAll(headers);
     try {
       isLoading.value = true;
       http.StreamedResponse response = await request.send();
       print(response.statusCode);
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         Get.showSnackbar(const GetSnackBar(
           message: "Parcel Created",
           duration: Duration(seconds: 2),
@@ -119,7 +121,7 @@ class ParcelController extends GetxController {
           message: "Access Denied. Invalid Token",
           duration: Duration(seconds: 2),
         ));
-      }else{
+      } else {
         Get.showSnackbar(const GetSnackBar(
           message: "Something went wrong. Please try again",
           duration: Duration(seconds: 2),
@@ -132,29 +134,28 @@ class ParcelController extends GetxController {
     }
   }
 
-  Future<void> updateParcel({
-    required String id,
-    required String merchantOrderId,
-    required String recipientName ,
-    required String recipientPhone ,
-    required String recipientCity ,
-    required String recipientArea ,
-    required String recipientZone ,
-    required String recipientAddress ,
-    required int amountToCollect,
-    required int stockPrice ,
-    required String itemDescription ,
-    required int itemQuantity ,
-    required int itemWeight ,
-    required String specialInstruction}) async{
+  Future<void> updateParcel(
+      {required String id,
+      required String merchantOrderId,
+      required String recipientName,
+      required String recipientPhone,
+      required String recipientCity,
+      required String recipientArea,
+      required String recipientZone,
+      required String recipientAddress,
+      required int amountToCollect,
+      required int stockPrice,
+      required String itemDescription,
+      required int itemQuantity,
+      required int itemWeight,
+      required String specialInstruction}) async {
     prefs = await SharedPreferences.getInstance();
     var authToken = prefs.getString("authToken");
     var headers = {
       'Content-Type': 'application/json',
       'x-auth-token': authToken!
     };
-    var request = http.Request(
-        'PUT', Uri.parse('${apiUrl}parcels/update/$id'));
+    var request = http.Request('PUT', Uri.parse('${apiUrl}parcels/update/$id'));
     request.body = json.encode({
       "merchantOrderId": merchantOrderId,
       "recipientName": recipientName,
@@ -180,7 +181,7 @@ class ParcelController extends GetxController {
           message: "Parcel Updated",
           duration: Duration(seconds: 2),
         ));
-      } else if (response.statusCode == 401) {
+      }else if(response.statusCode == 401) {
         Get.showSnackbar(const GetSnackBar(
           message: "Access Denied. Invalid Token",
           duration: Duration(seconds: 2),
@@ -195,6 +196,19 @@ class ParcelController extends GetxController {
     } catch (e) {
       isLoading.value = false;
       print("Error from updateParcel: ${e.toString()}");
+    }
+  }
+
+  void searchParcel(String query) async {
+    isLoading.value = true;
+    filtered_list.clear();
+    if (query.isEmpty) {
+      filtered_list.assignAll(parcel_list);
+    } else {
+      filtered_list.assignAll(parcel_list.where((parcel) =>
+          parcel.recipientName.toLowerCase().contains(query.toLowerCase()) ||
+          parcel.recipientPhone.toLowerCase().contains(query.toLowerCase()) ||
+          parcel.recipientCity.toLowerCase().contains(query.toLowerCase())));
     }
   }
 }

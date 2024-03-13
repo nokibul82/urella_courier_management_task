@@ -37,7 +37,7 @@ class _UpdateParcelScreenState extends State<UpdateParcelScreen> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     // Process the form data here (e.g., submit to a server)
-                    await Get.find<ParcelController>().updateParcel(
+                    Get.find<ParcelController>().updateParcel(
                         id: widget.parcelModel.id,
                         merchantOrderId: _merchantOrderId,
                         recipientName: _recipientName,
@@ -52,9 +52,8 @@ class _UpdateParcelScreenState extends State<UpdateParcelScreen> {
                         itemQuantity: _itemQuantity,
                         itemWeight: _itemWeight,
                         specialInstruction: _specialInstruction);
+                    Get.back();
                   }
-                  _formKey.currentState!.reset();
-                  Get.back();
                 },
                 child: Text("Update"))
           ],
