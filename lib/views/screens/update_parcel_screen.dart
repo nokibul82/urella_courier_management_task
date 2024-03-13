@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:urella_courier_management_task/controllers/parcel_controller.dart';
+import '../../controllers/parcel_controller.dart';
+import '../../models/response_model.dart';
 
-class CreateParcelScreen extends StatefulWidget {
-  const CreateParcelScreen({super.key});
-
+class UpdateParcelScreen extends StatefulWidget {
+  const UpdateParcelScreen({super.key,required this.parcelModel});
+  final ParcelModel parcelModel;
   @override
-  State<CreateParcelScreen> createState() => _CreateParcelScreenState();
+  State<UpdateParcelScreen> createState() => _UpdateParcelScreenState();
 }
 
-class _CreateParcelScreenState extends State<CreateParcelScreen> {
+class _UpdateParcelScreenState extends State<UpdateParcelScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _merchantOrderId = "";
   String _recipientName = "";
@@ -24,7 +25,6 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
   int _itemQuantity = 0;
   int _itemWeight = 0;
   String _specialInstruction = "";
-  String _shopId = "";
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,8 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
                     // Process the form data here (e.g., submit to a server)
-                    await Get.find<ParcelController>().createParcel(
+                    await Get.find<ParcelController>().updateParcel(
+                        id: widget.parcelModel.id,
                         merchantOrderId: _merchantOrderId,
                         recipientName: _recipientName,
                         recipientPhone: _recipientPhone,
@@ -50,13 +51,12 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                         itemDescription: _itemDescription,
                         itemQuantity: _itemQuantity,
                         itemWeight: _itemWeight,
-                        specialInstruction: _specialInstruction,
-                        shopId: _shopId);
-                    //_formKey.currentState!.reset();
-                    Get.back();
+                        specialInstruction: _specialInstruction);
                   }
+                  _formKey.currentState!.reset();
+                  Get.back();
                 },
-                child: Text("Create"))
+                child: Text("Update"))
           ],
         ),
         body: SingleChildScrollView(
@@ -70,7 +70,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Merchant Order ID'),
-                        initialValue: _merchantOrderId,
+                        initialValue: widget.parcelModel.merchantOrderId,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a valid Order ID';
@@ -84,7 +84,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Recipient Name'),
-                        initialValue: _recipientName,
+                        initialValue: widget.parcelModel.recipientName,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter the recipient\'s name';
@@ -99,7 +99,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                               borderRadius: BorderRadius.circular(10.0)),
                           labelText: 'Recipient Phone',
                         ),
-                        initialValue: _recipientPhone,
+                        initialValue: widget.parcelModel.recipientPhone,
                         keyboardType: TextInputType.phone,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -115,7 +115,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Recipient City'),
-                        initialValue: _recipientCity,
+                        initialValue: widget.parcelModel.recipientCity,
                         onSaved: (newValue) => _recipientCity = newValue!,
                       ),
                       TextFormField(
@@ -123,7 +123,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Recipient Area'),
-                        initialValue: _recipientArea,
+                        initialValue: widget.parcelModel.recipientArea,
                         onSaved: (newValue) => _recipientArea = newValue!,
                       ),
                       TextFormField(
@@ -131,7 +131,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Recipient Zone'),
-                        initialValue: _recipientZone,
+                        initialValue: widget.parcelModel.recipientZone,
                         onSaved: (newValue) => _recipientZone = newValue!,
                       ),
                       TextFormField(
@@ -139,7 +139,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Recipient Address'),
-                        initialValue: _recipientAddress,
+                        initialValue: widget.parcelModel.recipientAddress,
                         maxLines: null,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -155,7 +155,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Amount to Collect'),
-                        initialValue: _amountToCollect.toString(),
+                        initialValue: widget.parcelModel.amountToCollect.toString(),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null ||
@@ -166,24 +166,24 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                           return null;
                         },
                         onSaved: (newValue) =>
-                            _amountToCollect = int.parse(newValue!),
+                        _amountToCollect = int.parse(newValue!),
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Stock Price'),
-                        initialValue: _stockPrice.toString(),
+                        initialValue: widget.parcelModel.stockPrice.toString(),
                         keyboardType: TextInputType.number,
                         onSaved: (newValue) =>
-                            _stockPrice = int.parse(newValue!),
+                        _stockPrice = int.parse(newValue!),
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Item Description'),
-                        initialValue: _itemDescription,
+                        initialValue: widget.parcelModel.itemDescription,
                         onSaved: (newValue) => _itemDescription = newValue!,
                       ),
                       TextFormField(
@@ -191,7 +191,7 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Item Quantity'),
-                        initialValue: _itemQuantity.toString(),
+                        initialValue: widget.parcelModel.itemQuantity.toString(),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -200,14 +200,14 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                           return null;
                         },
                         onSaved: (newValue) =>
-                            _itemQuantity = int.parse(newValue!),
+                        _itemQuantity = int.parse(newValue!),
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Item Weight (kg/g)'),
-                        initialValue: _itemWeight.toString(),
+                        initialValue: widget.parcelModel.itemWeight.toString(),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -216,31 +216,17 @@ class _CreateParcelScreenState extends State<CreateParcelScreen> {
                           return null;
                         },
                         onSaved: (newValue) =>
-                            _itemWeight = int.parse(newValue!),
+                        _itemWeight = int.parse(newValue!),
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10.0)),
                             labelText: 'Special Instructions (Optional)'),
-                        initialValue: _specialInstruction,
+                        initialValue: widget.parcelModel.specialInstruction,
                         maxLines:
-                            null, // Allows multiline input for instructions
+                        null, // Allows multiline input for instructions
                         onSaved: (newValue) => _specialInstruction = newValue!,
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0)),
-                            labelText: 'Shop ID'),
-                        initialValue: _shopId,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter the shop ID';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) => _shopId = newValue!,
                       ),
                     ])))));
   }
